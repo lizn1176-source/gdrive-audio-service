@@ -32,7 +32,15 @@ def test():
     
 @app.post("/drive")
 def drive(request: DriveRequest):
+
+    match = re.search(r"/d/([a-zA-Z0-9_-]+)", request.url)
+
+    if not match:
+        raise HTTPException(status_code=400, detail="Invalid Google Drive link")
+
+    file_id = match.group(1)
+
     return {
         "success": True,
-        "url": request.url
+        "file_id": file_id
     }
