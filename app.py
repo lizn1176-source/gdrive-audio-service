@@ -5,12 +5,16 @@ import json
 import re
 import subprocess
 import io
+from pydantic import BaseModel
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
 app = FastAPI()
+
+class DriveRequest(BaseModel):
+    url: str
 
 
 @app.get("/")
@@ -24,4 +28,11 @@ def test():
     return {
         "success": True,
         "message": "Endpoint works"
+    }
+    
+@app.post("/drive")
+def drive(request: DriveRequest):
+    return {
+        "success": True,
+        "url": request.url
     }
