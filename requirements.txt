@@ -3,3 +3,11 @@ uvicorn
 requests
 python-multipart
 aiofiles
+
+google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-resumable-media
+
+ffmpeg-python
