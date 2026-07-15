@@ -19,3 +19,9 @@ def root():
         "status": "ok",
         "message": "Google Drive Audio Service is running"
     }
+@app.post("/test")
+def test():
+    return {
+        "success": True,
+        "message": "Endpoint works"
+    }
