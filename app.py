@@ -49,13 +49,14 @@ def drive(request: DriveRequest):
 
     service = build("drive", "v3", credentials=credentials)
 
-   file = service.files().get(
-    fileId=file_id,
-    fields="id,name,mimeType,size",
-    supportsAllDrives=True
-).execute()
+    file = service.files().get(
+        fileId=file_id,
+        fields="id,name,mimeType,size",
+        supportsAllDrives=True
+    ).execute()
 
     return {
         "success": True,
+        "received_file_id": file_id,
         "file": file
     }
