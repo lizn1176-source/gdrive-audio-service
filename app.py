@@ -40,7 +40,21 @@ def drive(request: DriveRequest):
 
     file_id = match.group(1)
 
+    credentials_info = json.loads(os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"])
+
+    credentials = service_account.Credentials.from_service_account_info(
+        credentials_info,
+        scopes=["https://www.googleapis.com/auth/drive.readonly"]
+    )
+
+    service = build("drive", "v3", credentials=credentials)
+
+    file = service.files().get(
+        fileId=file_id,
+        fields="id,name,mimeType,size"
+    ).execute()
+
     return {
         "success": True,
-        "file_id": file_id
+        "file": file
     }
