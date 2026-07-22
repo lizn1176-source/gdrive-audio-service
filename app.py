@@ -54,23 +54,24 @@ def drive(request: DriveRequest):
         fields="id,name,mimeType,size",
         supportsAllDrives=True
     ).execute()
+
     request_download = service.files().get_media(fileId=file_id)
 
-os.makedirs("temp", exist_ok=True)
+    os.makedirs("temp", exist_ok=True)
 
-video_path = f"temp/{file_id}.mp4"
+    video_path = f"temp/{file_id}.mp4"
 
-with io.FileIO(video_path, "wb") as fh:
-    downloader = MediaIoBaseDownload(fh, request_download)
+    with io.FileIO(video_path, "wb") as fh:
+        downloader = MediaIoBaseDownload(fh, request_download)
 
-    done = False
-    while not done:
-        status, done = downloader.next_chunk()
+        done = False
+        while not done:
+            status, done = downloader.next_chunk()
 
-  return {
-    "success": True,
-    "received_file_id": file_id,
-    "file": file,
-    "video_exists": os.path.exists(video_path),
-    "video_size": os.path.getsize(video_path)
-}
+    return {
+        "success": True,
+        "received_file_id": file_id,
+        "file": file,
+        "video_exists": os.path.exists(video_path),
+        "video_size": os.path.getsize(video_path)
+    }
