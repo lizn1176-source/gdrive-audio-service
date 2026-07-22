@@ -68,16 +68,16 @@ def drive(request: DriveRequest):
         while not done:
             status, done = downloader.next_chunk()
 
-   ffmpeg_version = subprocess.run(
-    ["ffmpeg", "-version"],
-    capture_output=True,
-    text=True
-)
+    ffmpeg_version = subprocess.run(
+        ["ffmpeg", "-version"],
+        capture_output=True,
+        text=True
+    )
 
-return {
-    "success": True,
-    "video_exists": os.path.exists(video_path),
-    "video_size": os.path.getsize(video_path),
-    "ffmpeg_installed": ffmpeg_version.returncode == 0,
-    "ffmpeg_output": ffmpeg_version.stdout.split("\n")[0]
-}
+    return {
+        "success": True,
+        "video_exists": os.path.exists(video_path),
+        "video_size": os.path.getsize(video_path),
+        "ffmpeg_installed": ffmpeg_version.returncode == 0,
+        "ffmpeg_output": ffmpeg_version.stdout.split("\n")[0]
+    }
