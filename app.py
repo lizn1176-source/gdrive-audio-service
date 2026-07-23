@@ -14,6 +14,7 @@ from googleapiclient.http import MediaIoBaseDownload
 
 app = FastAPI()
 
+AUDIO_FOLDER_ID = "13-kBZvyZYTFK_2xw1bkMIMa-pfsQN_pu"
 
 class DriveRequest(BaseModel):
     url: str
