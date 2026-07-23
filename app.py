@@ -68,16 +68,23 @@ def drive(request: DriveRequest):
         while not done:
             status, done = downloader.next_chunk()
 
-    ffmpeg_version = subprocess.run(
-        ["ffmpeg", "-version"],
-        capture_output=True,
-        text=True
+    audio_path = f"temp/{file_id}.mp3"
+
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-i", video_path,
+            "-vn",
+            "-acodec", "libmp3lame",
+            "-ab", "192k",
+            "-y",
+            audio_path
+        ],
+        check=True
     )
 
-    return {
-        "success": True,
-        "video_exists": os.path.exists(video_path),
-        "video_size": os.path.getsize(video_path),
-        "ffmpeg_installed": ffmpeg_version.returncode == 0,
-        "ffmpeg_output": ffmpeg_version.stdout.split("\n")[0]
-    }
+    return FileResponse(
+        audio_path,
+        media_type="audio/mpeg",
+        filename=f"{file_id}.mp3"
+    )
