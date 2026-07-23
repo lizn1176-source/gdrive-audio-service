@@ -1,10 +1,11 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
 import os
 import json
 import re
 import subprocess
 import io
+import requests
+
 from pydantic import BaseModel
 
 from google.oauth2 import service_account
@@ -12,6 +13,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
 app = FastAPI()
+
 
 class DriveRequest(BaseModel):
     url: str
@@ -23,13 +25,16 @@ def root():
         "status": "ok",
         "message": "Google Drive Audio Service is running"
     }
+
+
 @app.post("/test")
 def test():
     return {
         "success": True,
         "message": "Endpoint works"
     }
-    
+
+
 @app.post("/drive")
 def drive(request: DriveRequest):
 
@@ -40,7 +45,9 @@ def drive(request: DriveRequest):
 
     file_id = match.group(1)
 
-    credentials_info = json.loads(os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"])
+    credentials_info = json.loads(
+        os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]
+    )
 
     credentials = service_account.Credentials.from_service_account_info(
         credentials_info,
@@ -65,6 +72,7 @@ def drive(request: DriveRequest):
         downloader = MediaIoBaseDownload(fh, request_download)
 
         done = False
+
         while not done:
             status, done = downloader.next_chunk()
 
@@ -83,8 +91,32 @@ def drive(request: DriveRequest):
         check=True
     )
 
-    return FileResponse(
-        audio_path,
-        media_type="audio/mpeg",
-        filename=f"{file_id}.mp3"
-    )
+    api_key = os.environ["ASSEMBLYAI_API_KEY"]
+
+    headers = {
+        "authorization": api_key
+    }
+
+    with open(audio_path, "rb") as f:
+
+        upload = requests.post(
+            "https://api.assemblyai.com/v2/upload",
+            headers=headers,
+            data=f
+        )
+
+    upload.raise_for_status()
+
+    upload_url = upload.json()["upload_url"]
+
+    if os.path.exists(video_path):
+        os.remove(video_path)
+
+    if os.path.exists(audio_path):
+        os.remove(audio_path)
+
+    return {
+        "success": True,
+        "upload_url": upload_url,
+        "file_name": file["name"]
+    }
