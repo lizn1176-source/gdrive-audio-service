@@ -20,6 +20,34 @@ class DriveRequest(BaseModel):
     url: str
 
 
+def upload_to_drive(service, file_path, file_name):
+    file_metadata = {
+        "name": file_name,
+        "parents": [AUDIO_FOLDER_ID]
+    }
+
+    media = MediaFileUpload(
+        file_path,
+        mimetype="audio/mpeg",
+        resumable=True
+    )
+
+    uploaded_file = service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields="id, webViewLink"
+    ).execute()
+
+    service.permissions().create(
+        fileId=uploaded_file["id"],
+        body={
+            "type": "anyone",
+            "role": "reader"
+        }
+    ).execute()
+
+    return uploaded_file
+    
 @app.get("/")
 def root():
     return {
