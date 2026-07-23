@@ -51,7 +51,7 @@ def drive(request: DriveRequest):
 
     credentials = service_account.Credentials.from_service_account_info(
         credentials_info,
-        scopes=["https://www.googleapis.com/auth/drive.readonly"]
+        scopes=["https://www.googleapis.com/auth/drive"]
     )
 
     service = build("drive", "v3", credentials=credentials)
